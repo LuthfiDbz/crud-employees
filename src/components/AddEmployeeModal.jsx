@@ -6,6 +6,8 @@ import { useEffect } from "react";
 
 const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
   const [inputData, setInputData] = useState({
+    id: '',
+    employeeId: '',
     name: '',
     email: '',
     department: '',
@@ -19,15 +21,38 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
     onFinish(inputData)
   }
 
+  const uniqueId = () => {
+    const dateString = Date.now().toString(36);
+    const randomness = Math.random().toString(36).substr(2);
+    return dateString + randomness;
+  };
+
   useEffect(() => {
-    setInputData({
-      name: '',
-      email: '',
-      department: '',
-      jobdesk: '',
-      salary: 0,
-      status: 1
-    })
+    if (open.action === 'edit') {
+      setInputData({
+        id: open?.data?.id,
+        employeeId: open?.data?.employeeId,
+        name: open?.data?.name,
+        email: open?.data?.email,
+        department: open?.data?.department,
+        jobdesk: open?.data?.jobdesk,
+        salary: open?.data?.salary,
+        status: open?.data?.status
+      })
+    } else {
+      const id = uniqueId()
+      setInputData({
+        id: id,
+        employeeId: '',
+        name: '',
+        email: '',
+        department: '',
+        jobdesk: '',
+        salary: 0,
+        status: 1
+      })
+    }
+
   }, [open])
 
   return (
@@ -98,12 +123,12 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
             <label htmlFor="salary">Salary</label>
             <br />
             <input
-              type="text"
+              type="number"
               name="salary"
               id="salary"
               placeholder="Type employee salary..."
               value={inputData.salary}
-              onChange={(e) => setInputData({ ...inputData, salary: e.target.value })}
+              onChange={(e) => setInputData({ ...inputData, salary: parseInt(e.target.value) })}
             />
             <br />
 

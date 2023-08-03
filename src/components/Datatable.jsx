@@ -4,29 +4,36 @@ import AddEmployeeModal from "./AddEmployeeModal";
 import { useState } from "react";
 import { useEffect } from "react";
 
-const Datatable = () => {
+const Datatable = ({ datas, getData, getTotalData }) => {
   const [openModal, setOpenModal] = useState({ visible: false })
   const [data, setData] = useState([])
 
-  const getData = () => {
-    const dataJSON = JSON.parse(localStorage.getItem('employeeData'))
-    console.log(dataJSON)
-    setData([dataJSON])
-  }
-
   useEffect(() => {
-    getData()
-  }, [])
+    setData(datas)
+  }, [datas])
 
   const handleAddEmployee = (val) => {
-    console.log(val)
-    localStorage.setItem('employeeData', JSON.stringify(val))
+    let payload = []
+    if (openModal.action === 'edit') {
+      const index = data?.findIndex((dat) => dat.id === openModal?.data?.id)
+      let tempData = data
+      tempData[index] = val
+      payload = tempData
+    } else {
+      data ? payload = [...data, val] : payload = [val]
+    }
+
+    localStorage.setItem('employeeData', JSON.stringify(payload))
     setOpenModal({ visible: false })
     getData()
+    getTotalData()
   }
 
-  const handleDeleteEmployee = () => {
-
+  const handleDeleteEmployee = (id) => {
+    const filterData = data?.filter((dat) => dat.id !== id)
+    localStorage.setItem('employeeData', JSON.stringify(filterData))
+    getData()
+    getTotalData()
   }
 
   return (
@@ -41,7 +48,7 @@ const Datatable = () => {
       <div class="divTable cinereousTable">
         <div class="divTableHeading">
           <div class="divTableRow">
-            <div class="divTableHead">ID</div>
+            <div class="divTableHead">No</div>
             <div class="divTableHead">Name</div>
             <div class="divTableHead">Email</div>
             <div class="divTableHead">Department</div>
@@ -52,26 +59,28 @@ const Datatable = () => {
           </div>
         </div>
         <div class="divTableBody">
-          {data.map((dat) => {
+          {data?.map((dat, index) => {
             return (
-              <div class="divTableRow">
-                <div class="divTableCell">{dat?.id}</div>
+              <div class="divTableRow" key={dat?.id}>
+                <div class="divTableCell">{index + 1}</div>
                 <div class="divTableCell">{dat?.name}</div>
                 <div class="divTableCell">{dat?.email}</div>
                 <div class="divTableCell">{dat?.department}</div>
                 <div class="divTableCell">{dat.jobdesk}</div>
                 <div class="divTableCell">${dat.salary}</div>
-                <div class="divTableCell">{dat.status == 1 ? 'Active' : 'Inactive'}</div>
+                <div class={`divTableCell ${dat.status == 1 ? 'active' : 'inactive'}`}><span>{dat.status == 1 ? 'Active' : 'Inactive'}</span></div>
                 <div class="divTableCell action">
                   <AiFillEdit
                     size={25}
                     color="blue"
                     style={{ marginRight: '1rem', cursor: 'pointer' }}
+                    onClick={() => setOpenModal({ visible: true, action: 'edit', data: dat })}
                   />
                   <AiFillDelete
                     size={25}
                     color="red"
                     style={{ cursor: 'pointer' }}
+                    onClick={() => handleDeleteEmployee(dat?.id)}
                   />
                 </div>
               </div>

@@ -97,6 +97,20 @@ div.cinereousTable {
   vertical-align: middle;
 }
 
+.divTableCell span {
+  color: white;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.2rem;
+}
+
+.divTableCell.active span {
+  background-color: green;
+}
+
+.divTableCell.inactive span {
+  background-color: red;
+}
+
 .action {
   text-align: center;
 }
