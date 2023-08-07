@@ -15,10 +15,23 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
     salary: 0,
     status: 1
   })
+  const [dataValid, setDataValid] = useState({})
 
   const onSubmit = (e) => {
     e.preventDefault()
-    onFinish(inputData)
+
+    let errors = {};
+    if (!inputData.email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i)) {
+      errors.email = "Email is invalid";
+    }
+
+    setDataValid(errors)
+
+    if (Object.keys(errors).length === 0) {
+      onFinish(inputData)
+    }
+
+
   }
 
   const uniqueId = () => {
@@ -53,6 +66,8 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
       })
     }
 
+    setDataValid({})
+
   }, [open])
 
   return (
@@ -78,6 +93,7 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
               type="text"
               name="name"
               id="name"
+              required
               placeholder="Type employee name..."
               value={inputData.name}
               onChange={(e) => setInputData({ ...inputData, name: e.target.value })}
@@ -90,10 +106,13 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
               type="text"
               name="email"
               id="email"
+              required
               placeholder="Type employee email..."
               value={inputData.email}
               onChange={(e) => setInputData({ ...inputData, email: e.target.value })}
+              className={`${dataValid.email ? 'error' : ''}`}
             />
+            {dataValid.email && <p>{dataValid.email}</p>}
             <br />
 
             <label htmlFor="department">Department</label>
@@ -102,6 +121,7 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
               type="text"
               name="department"
               id="department"
+              required
               placeholder="Type employee department..."
               value={inputData.department}
               onChange={(e) => setInputData({ ...inputData, department: e.target.value })}
@@ -114,6 +134,7 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
               type="text"
               name="jobdesk"
               id="jobdesk"
+              required
               placeholder="Type employee jobdesk..."
               value={inputData.jobdesk}
               onChange={(e) => setInputData({ ...inputData, jobdesk: e.target.value })}
@@ -126,21 +147,41 @@ const AddEmployeeModal = ({ open, setOpen, onFinish }) => {
               type="number"
               name="salary"
               id="salary"
+              required
+              min={1}
               placeholder="Type employee salary..."
               value={inputData.salary}
               onChange={(e) => setInputData({ ...inputData, salary: parseInt(e.target.value) })}
             />
             <br />
 
-            <label htmlFor="status">Status</label>
+            <label className='status'>Status</label>
             <br />
             <input
+              type="radio"
+              name="status"
+              id="active"
+              value='active'
+              checked={inputData.status == 1}
+              onChange={() => setInputData({ ...inputData, status: 1 })}
+            />
+            <label className="status-label">Active</label>
+            <br />
+            <input
+              type="radio"
+              name="status"
+              id="inactive"
+              checked={inputData.status == 0}
+              onChange={() => setInputData({ ...inputData, status: 0 })}
+            />
+            <label className="status-label">Inactive</label>
+            {/* <input
               type="text"
               name="status"
               id="status"
               value={inputData.status}
               onChange={(e) => setInputData({ ...inputData, status: e.target.value })}
-            />
+            /> */}
           </div>
           <hr />
           <div className="footer-modal">
